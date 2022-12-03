@@ -9,6 +9,9 @@
     - role: download
     - role: raspberrypi
     - role: artis3n.tailscale
+      vars:
+        verbose: true
+        tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
 
 - hosts: master
   become: yes
