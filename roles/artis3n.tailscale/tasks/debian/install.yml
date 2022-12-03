@@ -1,0 +1,39 @@
+---
+- name: Debian | Apt Update
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Debian | Apt Dependencies
+  become: true
+  ansible.builtin.apt:
+    name: "{{ apt_dependencies }}"
+    state: present
+
+- name: Debian | Legacy Apt Dependencies
+  become: true
+  ansible.builtin.apt:
+    name: "{{ legacy_apt_dependencies }}"
+  when:
+    - ansible_distribution_major_version | int < 11
+    - ansible_distribution_major_version != "testing"
+
+- name: Debian | Add Tailscale Signing Key
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ apt_signkey }}"
+    dest: "{{ apt_keyring_path }}"
+    mode: '0644'
+
+- name: Debian | Add Tailscale Deb
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "{{ apt_deb }}"
+    state: present
+
+- name: Debian | Install Tailscale
+  become: true
+  ansible.builtin.apt:
+    name: "{{ tailscale_package }}"
+    state: '{{ state }}'
+    update_cache: true

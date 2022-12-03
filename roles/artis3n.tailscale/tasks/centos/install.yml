@@ -1,0 +1,19 @@
+---
+- name: CentOS | Yum Dependencies
+  become: true
+  ansible.builtin.yum:
+    name: "{{ yum_dependencies }}"
+    state: present
+
+- name: CentOS | Add Tailscale Repo
+  become: true
+  ansible.builtin.command: yum-config-manager --add-repo {{ yum_repos[ansible_distribution] }}
+  args:
+    creates: /etc/yum.repos.d/tailscale.repo
+
+- name: CentOS | Install Tailscale
+  become: true
+  ansible.builtin.yum:
+    name: "{{ tailscale_package }}"
+    update_cache: true
+    state: '{{ state }}'

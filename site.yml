@@ -4,14 +4,20 @@
   gather_facts: yes
   become: yes
   roles:
+    - role: update
     - role: prereq
     - role: download
     - role: raspberrypi
+    - role: artis3n.tailscale
 
 - hosts: master
   become: yes
   roles:
     - role: k3s/master
+    # I only care about accesing the main k3s node
+    # I can access all the others from just 1 node
+    # And this one is the most powerful
+    - role: wireguard
 
 - hosts: node
   become: yes
