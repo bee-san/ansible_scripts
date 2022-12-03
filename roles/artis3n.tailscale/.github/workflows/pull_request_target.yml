@@ -1,0 +1,195 @@
+---
+name: Molecule Tests
+
+on:
+  pull_request_target:
+    branches:
+     - main
+
+env:
+  # https://www.jeffgeerling.com/blog/2020/getting-colorized-output-molecule-and-ansible-on-github-actions-ci
+  PY_COLORS: '1'
+  ANSIBLE_FORCE_COLOR: '1'
+
+jobs:
+  molecule:
+    environment: E2E
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        distros:
+          - geerlingguy/docker-centos7-ansible:latest
+          - geerlingguy/docker-rockylinux8-ansible:latest
+          - geerlingguy/docker-rockylinux9-ansible:latest
+          - ghcr.io/artis3n/docker-almalinux8-ansible:latest
+          - ghcr.io/artis3n/docker-rhel8-ansible:latest
+          - ghcr.io/artis3n/docker-oraclelinux8-ansible:latest
+          - ghcr.io/artis3n/docker-amazonlinux2-ansible:latest
+          - ghcr.io/artis3n/docker-ubuntu2204-ansible:latest
+          - geerlingguy/docker-ubuntu2004-ansible:latest
+          - geerlingguy/docker-ubuntu1804-ansible:latest
+          - geerlingguy/docker-ubuntu1604-ansible:latest
+          - ghcr.io/artis3n/docker-debian12-ansible:latest
+          - geerlingguy/docker-debian11-ansible:latest
+          - geerlingguy/docker-debian10-ansible:latest
+          - geerlingguy/docker-debian9-ansible:latest
+          - geerlingguy/docker-fedora31-ansible:latest
+          - ghcr.io/artis3n/docker-arch-ansible:latest
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # - name: Install dependency manager
+      #   run: pipx install poetry
+
+      - name: Set up Python 3.x
+        id: setup-python
+        uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.10"
+          # Once supported in https://github.com/actions/setup-python/pull/281
+          # cache: 'poetry'
+
+      - name: Install dependency manager
+        run: pip install poetry
+
+      - name: Install packages
+        run: poetry install --no-interaction
+
+      - name: Default scenario
+        run: poetry run molecule test --scenario-name default
+        env:
+          MOLECULE_DISTRO: "${{ matrix.distros }}"
+          TAILSCALE_CI_KEY: "${{ secrets.TAILSCALE_CI_KEY }}"
+
+      - name: Uninstall scenario
+        run: poetry run molecule test --scenario-name state-absent
+        env:
+          MOLECULE_DISTRO: "${{ matrix.distros }}"
+          TAILSCALE_CI_KEY: "${{ secrets.TAILSCALE_CI_KEY }}"
+
+  molecule-skip-auth:
+    environment: E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # - name: Install dependency manager
+      #   run: pipx install poetry
+
+      - name: Set up Python 3.x
+        id: setup-python
+        uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.10"
+          # Once supported in https://github.com/actions/setup-python/pull/281
+          # cache: 'poetry'
+
+      - name: Install dependency manager
+        run: pip install poetry
+
+      - name: Install packages
+        run: poetry install --no-interaction
+
+      - name: Molecule - Skip Authentication
+        run: poetry run molecule test --scenario-name skip-authentication
+
+  molecule-vars-priority:
+    environment: E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # - name: Install dependency manager
+      #   run: pipx install poetry
+
+      - name: Set up Python 3.x
+        id: setup-python
+        uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.10"
+          # Once supported in https://github.com/actions/setup-python/pull/281
+          # cache: 'poetry'
+
+      - name: Install dependency manager
+        run: pip install poetry
+
+      - name: Install packages
+        run: poetry install --no-interaction
+
+      - name: Molecule - Vars Priority Validation
+        run: poetry run molecule test --scenario-name vars-priority
+        env:
+          TAILSCALE_CI_KEY: "${{ secrets.TAILSCALE_CI_KEY }}"
+
+  molecule-args:
+    environment: E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # - name: Install dependency manager
+      #   run: pipx install poetry
+
+      - name: Set up Python 3.x
+        id: setup-python
+        uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.10"
+          # Once supported in https://github.com/actions/setup-python/pull/281
+          # cache: 'poetry'
+
+      - name: Install dependency manager
+        run: pip install poetry
+
+      - name: Install packages
+        run: poetry install --no-interaction
+
+      - name: Molecule - Vars Priority Validation
+        run: poetry run molecule test --scenario-name args
+        env:
+          TAILSCALE_CI_KEY: "${{ secrets.TAILSCALE_CI_KEY }}"
+
+  molecule-state-present:
+    environment: E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # - name: Install dependency manager
+      #   run: pipx install poetry
+
+      - name: Set up Python 3.x
+        id: setup-python
+        uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.10"
+          # Once supported in https://github.com/actions/setup-python/pull/281
+          # cache: 'poetry'
+
+      - name: Install dependency manager
+        run: pip install poetry
+
+      - name: Install packages
+        run: poetry install --no-interaction
+
+      - name: Molecule - State Present
+        run: poetry run molecule test --scenario-name state-present
+        env:
+          TAILSCALE_CI_KEY: "${{ secrets.TAILSCALE_CI_KEY }}"

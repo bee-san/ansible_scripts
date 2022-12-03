@@ -1,0 +1,50 @@
+---
+galaxy_info:
+  role_name: tailscale
+  author: artis3n
+  description: Install and enable a Tailscale node.
+  license: license (MIT)
+
+  min_ansible_version: "2.12"
+
+  # Find supported platforms on https://galaxy.ansible.com/api/v1/platforms/
+  platforms:
+    - name: Ubuntu
+      versions:
+        - eoan
+        - bionic
+        - xenial
+        - focal
+        - groovy
+        - hirsute
+        - jammy
+    - name: EL
+      versions:
+        - "7"
+        - "8"
+    - name: Amazon Linux 2
+      versions:
+        - "all"
+    - name: Debian
+      versions:
+        - buster
+        - stretch
+        - bullseye
+        - bookworm
+        - sid
+    - name: Fedora
+      versions:
+        - "31"
+    - name: ArchLinux
+      versions:
+        - all
+
+  galaxy_tags:
+    - tailscale
+    - vpn
+    - networking
+
+collections:
+  - community.general
+
+dependencies: []

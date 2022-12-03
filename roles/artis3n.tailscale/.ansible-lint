@@ -1,0 +1,9 @@
+exclude_paths:
+    - .cache/
+    - .github/
+    - .idea/
+    - .vscode/
+
+skip_list:
+    - yaml[line-length]
+    - package-latest
